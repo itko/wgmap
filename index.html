@@ -22,7 +22,7 @@
 			id: 'mapbox.streets'
 		}).addTo(map);
 		
-	    $.getJSON('listings.geojson', function(data) {
+	    $.getJSON('https://res.cloudinary.com/itko/raw/upload/v1/WGmap/listings.geojson', function(data) {
 			new L.GeoJSON(data).bindPopup(function (layer) {
     			return '<a href="' + layer.feature.properties.url + '">' + layer.feature.properties.address + '</a>';
 			}).addTo(map);
