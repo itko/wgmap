@@ -18,6 +18,27 @@
 			</div>
 
 			<script>
+				
+				var makeHtmlFromProperties = function(props){
+					var description = $('<div/>', {
+					    id: 'description',
+					});
+					
+			  		var address = $( '<p id="address""></div>' ).text('Address: ' + props.address)
+					var price = $( '<p id="price""></div>' ).text('Price: ' + props.price)
+					var start = $( '<p id="start""></div>' ).text('Start: ' + props.start)
+					var url = $('<a target="_blank" rel="noopener noreferrer"></a>').attr('href', 'https://www.' + props.url).text('Link')
+					
+					description.append(address)
+					description.append(start)
+					description.append(price)
+					description.append(url)
+					
+					return description.html()
+				}
+					
+					
+				
 				var map = new mapboxgl.Map({
 					container: "map",
 					style: 'mapbox://styles/mapbox/streets-v11',
@@ -83,7 +104,7 @@
 							});
 							map.on('click', 'unclustered-point', function (e) {
 								var coordinates = e.features[0].geometry.coordinates.slice();
-								var description = '<a target="_blank" rel="noopener noreferrer" href = https://www.' + e.features[0].properties.url + '>' + e.features[0].properties.address + '</a>';
+								var description = makeHtmlFromProperties(e.features[0].properties)
  
 								// Ensure that if the map is zoomed out such that multiple
 								// copies of the feature are visible, the popup appears
