@@ -4,6 +4,42 @@
 	text-align: center;
 }
 
+#address {
+	font-size: 1.5em;
+	color: inherit;
+  	text-decoration: underline;
+  	display: block;
+  	margin-block-end: 0.5em;
+}
+
+#price {
+	color: #808080;
+	font-size: 1.3em;
+}
+
+#start {
+	color: #808080;
+	font-size: 1.2em;
+}
+
+.mapboxgl-popup-close-button {
+  display: none;
+}
+
+.mapboxgl-popup-content {
+  font: 400 15px/22px 'Source Sans Pro', 'Helvetica Neue', Sans-serif;
+  padding: 10px;
+  min-width: 200px;
+}
+
+.mapboxgl-popup-content p {
+	margin: 0;
+}
+
+.mapboxgl-popup-content-wrapper {
+  padding: 1%;
+}
+
 .home-form{
 	width: 100%;
   	position: absolute;

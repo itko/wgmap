@@ -4,7 +4,9 @@
 	<title>WGmap</title>
 	<meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
 	<script src='https://api.tiles.mapbox.com/mapbox-gl-js/v1.5.0/mapbox-gl.js'></script>
-	<link href='https://api.tiles.mapbox.com/mapbox-gl-js/v1.5.0/mapbox-gl.css' rel='stylesheet' />
+	<link href='https://api.tiles.mapbox.com/mapbox-gl-js/v1.6.0/mapbox-gl.css' rel='stylesheet' />
+	<link href='https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,700' rel='stylesheet'>
+	<link rel="stylesheet" type="text/css" href="style.css">
 	<style>
 		body { margin: 0; padding: 0; }
 		#map { position: absolute; top: 0; bottom: 0; width: 100%; };
@@ -13,26 +15,23 @@
 	<script>mapboxgl.accessToken = 'pk.eyJ1IjoiaXRrbyIsImEiOiJjazNscjlkOHgwbmZ0M2dubWI4OXlnZ3l2In0.uCYFVwB96WasXDZkLPua7g'</script>
 </head>
 
-<body>
+<body style = "font: 400 15px/22px 'Source Sans Pro', 'Helvetica Neue', Sans-serif;">
 	<div id="map" class="mapboxgl-map">
 	</div>
 
 	<script>
 
 		var makeHtmlFromProperties = function(props){
-			var description = $('<div/>', {
-				id: 'description',
-			});
+			var description = $('<div id = description></div>')
 
-			var address = $( '<p id="address""></div>' ).text('Address: ' + props.address)
-			var price = $( '<p id="price""></div>' ).text('Price: ' + props.price)
-			var start = $( '<p id="start""></div>' ).text('Start: ' + props.start)
-			var url = $('<a target="_blank" rel="noopener noreferrer"></a>').attr('href', props.url).text('Link')
+			var address = $( '<a id="address" target="_blank" rel="noopener noreferrer"></a>' ).text(props.address.split(",")[0])
+			var price = $( '<p id="price""></p>' ).text('CHF ' + props.price)
+			var start = $( '<p id="start""></p>' ).text(props.start)
+			var address = address.attr('href', props.url)
 
 			description.append(address)
 			description.append(start)
 			description.append(price)
-			description.append(url)
 
 			return description.html()
 		}
@@ -112,7 +111,7 @@
 						source: "listings",
 						filter: ["!", ["has", "point_count"]],
 						paint: {
-							"circle-color": "#11b4da",
+							"circle-color": "#9370DB",
 							"circle-radius": 10,
 							"circle-stroke-width": 1,
 							"circle-stroke-color": "#fff"
