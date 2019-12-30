@@ -68,7 +68,9 @@
 
 		$.getJSON('https://res.cloudinary.com/itko/raw/upload/v1/WGmap/cities.json', function(cities) {
 
-			$.getJSON('https://res.cloudinary.com/itko/raw/upload/v1/WGmap/listings.geojson', function(listings) {
+			query_city = cities.value[city]
+
+			$.getJSON('https://res.cloudinary.com/itko/raw/upload/v1/WGmap/'+query_city+'.geojson', function(listings) {
 
 				locality = cities.locality[city]
 				administrative_area_2 = cities.administrative_area_2[city]
