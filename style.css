@@ -1,13 +1,29 @@
+body {
+  margin: 0;
+}
+
+.popup-description {
+}
+
+.popup-images {
+  max-width: 200px;
+}
+
+.thumbnail {
+  max-width: 100%;
+  max-height: 200px;
+}
+
+.column {
+  margin: 10px;
+}
+
 #address {
 	font-size: 1.5em;
 	color: inherit;
 	text-decoration: underline;
 	display: block;
 	margin-block-end: 0.5em;
-}
-
-body {
-  margin: 0;
 }
 
 #price {
@@ -27,7 +43,8 @@ body {
 .mapboxgl-popup-content {
   font: 400 15px/22px 'Source Sans Pro', 'Helvetica Neue', Sans-serif;
   padding: 10px;
-  min-width: 200px;
+  display: flex;
+  flex-wrap: wrap;
 }
 
 .mapboxgl-popup-content p {

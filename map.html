@@ -49,18 +49,34 @@
 	<script>
 
 		var makeHtmlFromProperties = function(props){
-			var description = $('<div id = description></div>')
-
+			var popup = $('<div id="popup" ></div>')
+			var description = $('<div id="description" class="column popup-description"></div>')
 			var address = $( '<a id="address" target="_blank" rel="noopener noreferrer"></a>' ).text(props.address.split(",")[0])
 			var price = $( '<p id="price""></p>' ).text('CHF ' + props.price)
 			var start = $( '<p id="start""></p>' ).text(props.start)
 			var address = address.attr('href', props.url)
 
+			var images = $('<div id="popup-images" class="column popup-images"></div>')
+			if (props.thumb_url != 'null') {
+				thumb_url = props.thumb_url
+			}
+			else {
+				thumb_url = './house_icon.png'
+			}
+
+			var image = $('<img class="thumbnail" />').attr('src',thumb_url)
+
 			description.append(address)
 			description.append(start)
 			description.append(price)
+			description.append(image)
 
-			return description.html()
+			images.append(image)
+
+			popup.append(description)
+			popup.append(images)
+
+			return popup.html()
 		}
 
 		var urlParams = new URLSearchParams(window.location.search);
@@ -154,7 +170,7 @@
 							'event_value' : 1
 						});
 						var coordinates = e.features[0].geometry.coordinates.slice();
-						var description = makeHtmlFromProperties(e.features[0].properties)
+						var popup = makeHtmlFromProperties(e.features[0].properties)
 
 						// Ensure that if the map is zoomed out such that multiple
 						// copies of the feature are visible, the popup appears
@@ -163,9 +179,7 @@
 							coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
 						}
 
-						new mapboxgl.Popup().setLngLat(coordinates).setHTML(
-							description
-							).addTo(map);
+						new mapboxgl.Popup().setLngLat(coordinates).setHTML(popup).setMaxWidth('50%').addTo(map);
 					});
 
 					// inspect a cluster on click
