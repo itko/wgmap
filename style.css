@@ -55,9 +55,26 @@ body {
   padding: 1%;
 }
 
+.coming-soon{
+  margin-top: 3em;
+  font-size: 0.8em;
+  font-family: Verdana, Helvetica, sans-serif;
+}
+
+.coming-soon-title{
+  color: #555555;
+  font-weight: bold;
+}
+
+.coming-soon-item{
+  color: #AAAAAA;
+  font-size: 1em;
+  font-family: Verdana, Helvetica, sans-serif;
+  font-style: italic;
+}
+
 .home-form{
 	width: 100%;
-	/*position: absolute;*/
 	padding-top: 20vh;
   margin: 0;
 }
@@ -70,15 +87,19 @@ body {
 
 #home-title{
 	font-size: 5em;
-	font-family: Verdana, Helvetica, sans-serif;
+	font-family: Roboto, Helvetica Neue, sans-serif;
   margin-top: 0;
 }
 
-#feedback {
-  font: 400 15px/22px 'Source Sans Pro', 'Helvetica Neue', Sans-serif;
-  font-size: 1em;
+.feedback {
+  font: 400 15px/22px 'Roboto', 'Helvetica Neue', Sans-serif;
+  font-size: 1.5em;
   color: inherit;
   padding-top: 6em;
+  position: fixed;
+  bottom: 2em;
+  width: 100%;
+  text-align: center;
 }
 
 /* The container <div> - needed to position the dropdown content */
