@@ -90,11 +90,17 @@
 
 				locality = cities.locality[city]
 				administrative_area_2 = cities.administrative_area_2[city]
+				console.log(locality)
 
 				var bounds = new mapboxgl.LngLatBounds();
 				listings.features.forEach(function(feature) {
-					if (feature.properties.admin_area_2 == administrative_area_2) {
-    					bounds.extend(feature.geometry.coordinates);
+					if (locality != null) {
+						if (feature.properties.locality == locality){
+	    					bounds.extend(feature.geometry.coordinates);
+						}
+					}
+					else {
+						bounds.extend(feature.geometry.coordinates);
 					}
 				});
 
