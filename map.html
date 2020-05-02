@@ -80,35 +80,27 @@
 		}
 
 		var urlParams = new URLSearchParams(window.location.search);
-		city = urlParams.get('city')
+		file_name = urlParams.get('city')
 
-		$.getJSON('https://res.cloudinary.com/itko/raw/upload/v1/WGmap/cities.json', function(cities) {
+		$.getJSON('https://res.cloudinary.com/itko/raw/upload/v1/WGmap/metadata.json', function(cities) {
+			for (let key in cities['file_name']) {
+				if (cities['file_name'][key] == file_name) {
+					city = key
+					break
+				}
+			}
+			var sw = new mapboxgl.LngLat(cities['xmin'][city],cities['ymin'][city]);
+			var ne = new mapboxgl.LngLat(cities['xmax'][city],cities['ymax'][city]);
+			var bounds = new mapboxgl.LngLatBounds(sw, ne);
 
-			query_city = cities.value[city]
-
-			$.getJSON('https://res.cloudinary.com/itko/raw/upload/v1/WGmap/'+query_city+'.geojson', function(listings) {
-
-				locality = cities.locality[city]
-				administrative_area_2 = cities.administrative_area_2[city]
-				console.log(locality)
-
-				var bounds = new mapboxgl.LngLatBounds();
-				listings.features.forEach(function(feature) {
-					if (locality != null) {
-						if (feature.properties.locality == locality){
-	    					bounds.extend(feature.geometry.coordinates);
-						}
-					}
-					else {
-						bounds.extend(feature.geometry.coordinates);
-					}
-				});
+			$.getJSON('https://res.cloudinary.com/itko/raw/upload/v1/WGmap/'+file_name+'.geojson', function(listings) {
 
 				var map = new mapboxgl.Map({
 					container: "map",
 					style: 'mapbox://styles/mapbox/streets-v11',
 					bounds: bounds
 				});
+
 				map.setMaxBounds(map.getBounds())
 
 				map.on("load", function() {
@@ -186,21 +178,7 @@
 						}
 
 						new mapboxgl.Popup().setLngLat(coordinates).setHTML(popup).setMaxWidth('50%').addTo(map);
-					});
 
-					// inspect a cluster on click
-					map.on('click', 'clusters', function (e) {
-						var features = map.queryRenderedFeatures(e.point, { layers: ['clusters'] });
-						var clusterId = features[0].properties.cluster_id;
-						map.getSource('listings').getClusterExpansionZoom(clusterId, function (err, zoom) {
-							if (err)
-								return;
-
-							map.easeTo({
-								center: features[0].geometry.coordinates,
-								zoom: zoom
-							});
-						});
 					});
 
 					// Change the cursor to a pointer when the mouse is over the places layer.
