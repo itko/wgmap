@@ -1,8 +1,32 @@
-body {
+.body {
   margin: 0;
+  padding: 0;
 }
 
-.popup-description {
+.mapboxgl-map {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 100%;
+}
+
+.mapboxgl-popup-close-button {
+  display: none;
+}
+
+.mapboxgl-popup-content {
+  font: 400 15px/22px 'Source Sans Pro', 'Helvetica Neue', Sans-serif;
+  padding: 10px;
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.mapboxgl-popup-content p {
+	margin: 0;
+}
+
+.mapboxgl-popup-content-wrapper {
+  padding: 1%;
 }
 
 .popup-images {
@@ -34,23 +58,4 @@ body {
 #start {
 	color: #808080;
 	font-size: 1.2em;
-}
-
-.mapboxgl-popup-close-button {
-  display: none;
-}
-
-.mapboxgl-popup-content {
-  font: 400 15px/22px 'Source Sans Pro', 'Helvetica Neue', Sans-serif;
-  padding: 10px;
-  display: flex;
-  flex-wrap: wrap;
-}
-
-.mapboxgl-popup-content p {
-	margin: 0;
-}
-
-.mapboxgl-popup-content-wrapper {
-  padding: 1%;
 }
