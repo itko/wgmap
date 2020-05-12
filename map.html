@@ -23,17 +23,18 @@
 	</script>
 	<!-- End Google Analytics -->
 
-	<style>
-	</style>
-
 	<script src='https://api.tiles.mapbox.com/mapbox-gl-js/v1.5.0/mapbox-gl.js'></script>
 	<script>mapboxgl.accessToken = 'pk.eyJ1IjoiaXRrbyIsImEiOiJjazQ1Z2wzMmkwOGsyM29qdGs2b3lmaG92In0.ymoXX9Mx7eTOSnByhQ8gZg'</script>
 	<script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+	<script src="assets/wNumb.js"></script>
+	<script src="assets/nouislider.js"></script>
 
+	<link rel="icon" type="image/x-icon" href="assets/houses.png">
 	<link href='https://api.tiles.mapbox.com/mapbox-gl-js/v1.6.0/mapbox-gl.css' rel='stylesheet' />
-	<link href='https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,700' rel='stylesheet'>
-	<link rel="stylesheet" type="text/css" href="map.css">
-
+	<link href='https://fonts.googleapis.com/css?family=Fredoka+One|Quicksand|Source+Sans+Pro:400,700' rel='stylesheet'>
+	<link rel="stylesheet" type="text/css" href="assets/map.css">
+	<link rel="stylesheet" type="text/css" href="assets/nouislider.css">
+	<link rel="stylesheet" type="text/css" href="assets/settings.css">
 </head>
 
 <body class='body'>
@@ -45,132 +46,191 @@
 	<div id="map" class="mapboxgl-map">
 	</div>
 
-	<script>
-
-		/**
-		* Function that registers a click on an outbound link in Analytics.
-		* This function takes a valid URL string as an argument, and uses that URL string
-		* as the event label. Setting the transport method to 'beacon' lets the hit be sent
-		* using 'navigator.sendBeacon' in browser that support it.
-		*/
-		var captureMarkerOutbound = function(url) {
-			gtag('event', 'click', {
-				'event_category': 'marker',
-				'event_action': 'click_outbound_listing',
-				'event_label': url,
-				'event_value' : 1,
-				'transport_type': 'beacon'
-			});
-		}
-
-		var makeHtmlFromProperties = function(props){
-			var popup = $('<div id="popup" ></div>')
-			var description = $('<div id="description" class="column popup-description"></div>')
-			var address = $(
-				'<a id="address" target="_blank" rel="noopener noreferrer"></a>').text(props.address.split(",")[0])
-			var price = $( '<p id="price""></p>' ).text('CHF ' + props.price)
-			var start = $( '<p id="start""></p>' ).text(props.start)
-			address = address.attr('href', props.url)
-			address.attr('onclick','captureMarkerOutbound("'+props.url+'")')
-
-			var images = $('<div id="popup-images" class="column popup-images"></div>')
-			if (props.thumb_url != 'null') {
-				thumb_url = props.thumb_url
-			}
-			else {
-				thumb_url = './house_icon.png'
-			}
-
-			var image = $('<img class="thumbnail" />').attr('src',thumb_url)
-
-			description.append(address)
-			description.append(start)
-			description.append(price)
-			description.append(image)
-
-			images.append(image)
-
-			popup.append(description)
-			popup.append(images)
-			return popup.html()
-		}
-
-		var urlParams = new URLSearchParams(window.location.search);
-		file_name = urlParams.get('city')
-
-		$.getJSON('https://res.cloudinary.com/itko/raw/upload/v1/WGmap/metadata.json', function(cities) {
-			for (let key in cities['file_name']) {
-				if (cities['file_name'][key] == file_name) {
-					city = key
-					break
-				}
-			}
-			var sw = new mapboxgl.LngLat(cities['xmin'][city],cities['ymin'][city]);
-			var ne = new mapboxgl.LngLat(cities['xmax'][city],cities['ymax'][city]);
-			var bounds = new mapboxgl.LngLatBounds(sw, ne);
-
-			$.getJSON('https://res.cloudinary.com/itko/raw/upload/v1/WGmap/'+file_name+'.geojson', function(listings) {
-
-				var map = new mapboxgl.Map({
-					container: "map",
-					style: 'mapbox://styles/mapbox/streets-v11',
-					bounds: bounds
-				});
-				map.setMaxBounds(map.getBounds())
-
-				map.on("load", function() {
-
-					map.addSource("listings", {
-						type: "geojson",
-						data: listings,
-						cluster: false,
-					});
-					map.addLayer({
-						id: "unclustered-point",
-						type: "circle",
-						source: "listings",
-						paint: {
-							"circle-color": "#9370DB",
-							"circle-radius": 10,
-							"circle-stroke-width": 1,
-							"circle-stroke-color": "#fff"
-						}
-					});
-					map.on('click', 'unclustered-point', function (e) {
-						gtag('event', 'click', {
-							'event_category' : 'marker',
-							'event_action' : 'click',
-							'event_label' : e.features[0].properties.ref,
-							'event_value' : 1,
-							'transport_type': 'beacon'
-						});
-						var popup = makeHtmlFromProperties(e.features[0].properties);
-						var coordinates = e.features[0].geometry.coordinates.slice();
-						// Ensure that if the map is zoomed out such that multiple
-						// copies of the feature are visible, the popup appears
-						// over the copy being pointed to.
-						while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
-							coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
-						}
-						new mapboxgl.Popup().setLngLat(coordinates).setHTML(popup).setMaxWidth('50%').addTo(map);
-					});
-
-					// Change the cursor to a pointer when the mouse is over the places layer.
-					map.on('mouseenter', 'unclustered-point', function () {
-							map.getCanvas().style.cursor = 'pointer';
-						});
-
-					// Change it back to a pointer when it leaves.
-					map.on('mouseleave', 'unclustered-point', function () {
-							map.getCanvas().style.cursor = '';
-						});
-					});
-
-			});
-		})
-	
-	</script>
-
+	<div class='settings'>
+		<div class='circle item hide' id='settings_btn'></div>
+		<div class='menu item' id='settings_menu'>
+			<div id='slider'></div>
+		</div>
+	</div>
 
 </body>
+
+<script>
+	var slider = document.getElementById('slider');
+	noUiSlider.create(slider, {
+		start: [ 400, 1500 ], // Handle start position
+		padding: 0,
+		margin: 100,
+		step: 100,
+		connect: true, // Display a colored bar between the handles
+		orientation: 'horizontal',
+		behaviour: 'none',
+		range: {
+			'min': 100,
+			'max': 1500
+    	},
+		tooltips: [
+			wNumb({
+				decimals: 0,
+				suffix:' CHF',
+				edit: function (value) {
+					return value == '100 CHF' ? 'Min' : value;
+					}
+				}),
+			wNumb({
+				decimals: 0,
+				suffix:' CHF',
+				edit: function (value) {
+					return value == '1500 CHF' ? 'Max' : value;
+					}
+				}),
+			]
+	});
+
+	$.fn.animateRotate = function(angle, duration, easing, complete) {
+		return this.each(function() {
+			var $elem = $(this);
+
+			$({deg: 0}).animate({deg: angle}, {
+				duration: duration,
+				easing: easing,
+				step: function(now) {
+					$elem.css({
+					transform: 'rotate(' + now + 'deg)'
+					});
+				},
+				complete: complete || $.noop
+			});
+  		});
+	};
+	$('#settings_btn').click(function(){
+		$('#settings_menu').animate({width: 'toggle'},150);
+		$('#settings_btn').toggleClass('show hide');
+	});
+
+	var captureMarkerOutbound = function(url) {
+		gtag('event', 'click', {
+			'event_category': 'marker',
+			'event_action': 'click_outbound_listing',
+			'event_label': url,
+			'event_value' : 1,
+			'transport_type': 'beacon'
+		});
+	}
+
+	var makeHtmlFromProperties = function(props){
+		var popup = $('<div id="popup" ></div>')
+		var description = $('<div id="description" class="column popup-description"></div>')
+		var address = $(
+			'<a id="address" target="_blank" rel="noopener noreferrer"></a>').text(props.address.split(",")[0])
+		var price = $( '<p id="price""></p>' ).text('CHF ' + props.price)
+		var start = $( '<p id="start""></p>' ).text(props.start)
+		address = address.attr('href', props.url)
+		address.attr('onclick','captureMarkerOutbound("'+props.url+'")')
+
+		var images = $('<div id="popup-images" class="column popup-images"></div>')
+		if (props.thumb_url != 'null') {
+			thumb_url = props.thumb_url
+		}
+		else {
+			thumb_url = './house_icon.png'
+		}
+
+		var image = $('<img class="thumbnail" />').attr('src',thumb_url)
+
+		description.append(address)
+		description.append(start)
+		description.append(price)
+		description.append(image)
+
+		images.append(image)
+
+		popup.append(description)
+		popup.append(images)
+		return popup.html()
+	}
+
+	var urlParams = new URLSearchParams(window.location.search);
+	file_name = urlParams.get('city')
+
+	$.getJSON('https://res.cloudinary.com/itko/raw/upload/v1/WGmap/metadata.json', function(cities) {
+		for (let key in cities['file_name']) {
+			if (cities['file_name'][key] == file_name) {
+				city = key
+				break
+			}
+		}
+		var sw = new mapboxgl.LngLat(cities['xmin'][city],cities['ymin'][city]);
+		var ne = new mapboxgl.LngLat(cities['xmax'][city],cities['ymax'][city]);
+		var bounds = new mapboxgl.LngLatBounds(sw, ne);
+
+		$.getJSON('https://res.cloudinary.com/itko/raw/upload/v1/WGmap/'+file_name+'.geojson', function(listings) {
+
+			var map = new mapboxgl.Map({
+				container: "map",
+				style: 'mapbox://styles/mapbox/streets-v11',
+				attributionControl: false,
+				bounds: bounds
+			});
+			map.setMaxBounds(map.getBounds())
+			map.addControl(new mapboxgl.AttributionControl(), 'top-right');
+
+			map.on("load", function() {
+
+				map.addSource("listings", {
+					type: "geojson",
+					data: listings,
+					cluster: false,
+				});
+				map.addLayer({
+					id: "listing",
+					type: "circle",
+					source: "listings",
+					paint: {
+						"circle-color": "#9370DB",
+						"circle-radius": 10,
+						"circle-stroke-width": 1,
+						"circle-stroke-color": "#fff"
+					}
+				});
+				map.on('click', 'listing', function (e) {
+					gtag('event', 'click', {
+						'event_category' : 'marker',
+						'event_action' : 'click',
+						'event_label' : e.features[0].properties.ref,
+						'event_value' : 1,
+						'transport_type': 'beacon'
+					});
+					var popup = makeHtmlFromProperties(e.features[0].properties);
+					var coordinates = e.features[0].geometry.coordinates.slice();
+					// Ensure that if the map is zoomed out such that multiple
+					// copies of the feature are visible, the popup appears
+					// over the copy being pointed to.
+					while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
+						coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
+					}
+					new mapboxgl.Popup().setLngLat(coordinates).setHTML(popup).setMaxWidth('50%').addTo(map);
+				});
+
+				// Change the cursor to a pointer when the mouse is over the places layer.
+				map.on('mouseenter', 'listing', function () {
+					map.getCanvas().style.cursor = 'pointer';
+				});
+
+				// Change it back to a pointer when it leaves.
+				map.on('mouseleave', 'listing', function () {
+					map.getCanvas().style.cursor = '';
+				});
+
+				slider.noUiSlider.on('update', function (values, handle) {
+					var Pmin = parseInt(values[0])
+					var Pmax = parseInt(values[1])
+					map.setFilter('listing', ['all',['>=', 'price', Pmin],['<=', 'price', Pmax]]);
+				});
+			});
+
+		});
+	});
+
+</script>
 </html>
