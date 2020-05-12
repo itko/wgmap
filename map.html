@@ -106,6 +106,13 @@
 	$('#settings_btn').click(function(){
 		$('#settings_menu').animate({width: 'toggle'},150);
 		$('#settings_btn').toggleClass('show hide');
+		var c = $('#settings_btn').attr('class')
+		if (c.includes('hide')) {
+			captureSettingsButton('hide')
+		}
+		else if (c.includes('show')) {
+			captureSettingsButton('show')
+		}
 	});
 
 	var captureMarkerOutbound = function(url) {
@@ -113,6 +120,16 @@
 			'event_category': 'marker',
 			'event_action': 'click_outbound_listing',
 			'event_label': url,
+			'event_value' : 1,
+			'transport_type': 'beacon'
+		});
+	}
+
+	var captureSettingsButton = function(val) {
+		gtag('event', 'click', {
+			'event_category': 'settings',
+			'event_action': 'click_settings_button',
+			'event_label': val,
 			'event_value' : 1,
 			'transport_type': 'beacon'
 		});
