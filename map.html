@@ -181,71 +181,70 @@
 		var ne = new mapboxgl.LngLat(cities['xmax'][city],cities['ymax'][city]);
 		var bounds = new mapboxgl.LngLatBounds(sw, ne);
 
-		$.getJSON('https://res.cloudinary.com/itko/raw/upload/v1/WGmap/'+file_name+'.geojson', function(listings) {
+		var map = new mapboxgl.Map({
+			container: "map",
+			style: 'mapbox://styles/itko/cka4hkp9z052d1io371imc8a9',
+			attributionControl: false,
+			bounds: bounds
+		});
+		map.setMaxBounds(map.getBounds())
+		map.addControl(new mapboxgl.AttributionControl(), 'top-right');
 
-			var map = new mapboxgl.Map({
-				container: "map",
-				style: 'mapbox://styles/mapbox/streets-v11',
-				attributionControl: false,
-				bounds: bounds
+		
+		map.on("load", function() {
+
+			map.addSource("listings", {
+				type: "geojson",
+				data: 'https://res.cloudinary.com/itko/raw/upload/v1/WGmap/'+file_name+'.geojson',
+				buffer: 0,
+				cluster: false,
 			});
-			map.setMaxBounds(map.getBounds())
-			map.addControl(new mapboxgl.AttributionControl(), 'top-right');
-
-			map.on("load", function() {
-
-				map.addSource("listings", {
-					type: "geojson",
-					data: listings,
-					cluster: false,
+			map.addLayer({
+				id: "listing",
+				type: "circle",
+				source: "listings",
+				paint: {
+					"circle-opacity": 0.95,
+					"circle-color": "#9370DB",
+					"circle-radius": 8,
+					"circle-stroke-width": 1,
+					"circle-stroke-color": "#fff"
+				}
+			});
+			map.on('click', 'listing', function (e) {
+				gtag('event', 'click', {
+					'event_category' : 'marker',
+					'event_action' : 'click',
+					'event_label' : e.features[0].properties.ref,
+					'event_value' : 1,
+					'transport_type': 'beacon'
 				});
-				map.addLayer({
-					id: "listing",
-					type: "circle",
-					source: "listings",
-					paint: {
-						"circle-color": "#9370DB",
-						"circle-radius": 10,
-						"circle-stroke-width": 1,
-						"circle-stroke-color": "#fff"
-					}
-				});
-				map.on('click', 'listing', function (e) {
-					gtag('event', 'click', {
-						'event_category' : 'marker',
-						'event_action' : 'click',
-						'event_label' : e.features[0].properties.ref,
-						'event_value' : 1,
-						'transport_type': 'beacon'
-					});
-					var popup = makeHtmlFromProperties(e.features[0].properties);
-					var coordinates = e.features[0].geometry.coordinates.slice();
-					// Ensure that if the map is zoomed out such that multiple
-					// copies of the feature are visible, the popup appears
-					// over the copy being pointed to.
-					while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
-						coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
-					}
-					new mapboxgl.Popup().setLngLat(coordinates).setHTML(popup).setMaxWidth('50%').addTo(map);
-				});
-
-				// Change the cursor to a pointer when the mouse is over the places layer.
-				map.on('mouseenter', 'listing', function () {
-					map.getCanvas().style.cursor = 'pointer';
-				});
-
-				// Change it back to a pointer when it leaves.
-				map.on('mouseleave', 'listing', function () {
-					map.getCanvas().style.cursor = '';
-				});
-
-				slider.noUiSlider.on('update', function (values, handle) {
-					var Pmin = parseInt(values[0])
-					var Pmax = parseInt(values[1])
-					map.setFilter('listing', ['all',['>=', 'price', Pmin],['<=', 'price', Pmax]]);
-				});
+				var popup = makeHtmlFromProperties(e.features[0].properties);
+				var coordinates = e.features[0].geometry.coordinates.slice();
+				// Ensure that if the map is zoomed out such that multiple
+				// copies of the feature are visible, the popup appears
+				// over the copy being pointed to.
+				while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
+					coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
+				}
+				new mapboxgl.Popup().setLngLat(coordinates).setHTML(popup).setMaxWidth('50%').addTo(map);
 			});
 
+			// Change the cursor to a pointer when the mouse is over the places layer.
+			map.on('mouseenter', 'listing', function () {
+				map.getCanvas().style.cursor = 'pointer';
+			});
+
+			// Change it back to a pointer when it leaves.
+			map.on('mouseleave', 'listing', function () {
+				map.getCanvas().style.cursor = '';
+			});
+
+			slider.noUiSlider.on('update', function (values, handle) {
+				var Pmin = parseInt(values[0])
+				var Pmax = parseInt(values[1])
+				map.setFilter('listing', ['all',['>=', 'price', Pmin],['<=', 'price', Pmax]]);
+			});
 		});
 	});
 
