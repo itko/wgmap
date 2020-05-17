@@ -12,7 +12,6 @@ body {
 }
 
 .mapboxgl-popup {
-  opacity: 0.95;
 }
 
 .mapboxgl-popup-close-button {
