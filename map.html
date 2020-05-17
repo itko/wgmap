@@ -57,7 +57,7 @@
 	<script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
 	<script src="assets/wNumb.js"></script>
 	<script src="assets/nouislider.js"></script>
-	
+
 </body>
 
 <script>
@@ -143,12 +143,24 @@
 	var makeHtmlFromProperties = function(props){
 		var popup = $('<div id="popup" ></div>')
 		var description = $('<div id="description" class="column popup-description"></div>')
+		
+		// Address
 		var address = $(
 			'<a id="address" target="_blank" rel="noopener noreferrer"></a>').text(props.address.split(",")[0])
-		var price = $( '<p id="price""></p>' ).text('CHF ' + props.price)
-		var start = $( '<p id="start""></p>' ).text(props.start)
 		address = address.attr('href', props.url)
 		address.attr('onclick','captureMarkerOutbound("'+props.url+'")')
+		
+		// Price
+		var price_wrapper = $('<div class="price"></div>')
+		var price_icon = $( '<img class="icon"/>').attr('src','./assets/pricetag.png')
+		var price = $( '<span id="price""></span>' ).text('CHF ' + props.price)
+		price_wrapper.append([price_icon, price])
+		
+		// Start date
+		var start_wrapper = $('<div class="start"></div>')
+		var calendar_icon = $( '<img class="icon"/>').attr('src','./assets/calendar.svg')
+		var start = $( '<span id="start""></span>' ).text(props.start)
+		start_wrapper.append([calendar_icon, start])
 
 		var images = $('<div id="popup-images" class="column popup-images"></div>')
 		if (props.thumb_url != 'null') {
@@ -161,8 +173,8 @@
 		var image = $('<img class="thumbnail" />').attr('src',thumb_url)
 
 		description.append(address)
-		description.append(start)
-		description.append(price)
+		description.append(start_wrapper)
+		description.append(price_wrapper)
 		description.append(image)
 
 		images.append(image)

@@ -63,12 +63,32 @@ body {
 	margin-block-end: 0.5em;
 }
 
-#price {
+.start {
+  margin-top: 1em;
+}
+
+.price {
+  margin-top: 0.5em;
+}
+
+.price .icon{
+  opacity: 0.6 !important;
+}
+
+.price span{
 	color: #808080;
 	font-size: 1.3em;
 }
 
-#start {
+.popup-description .icon {
+  opacity: 0.4;
+  width: 1.2em;
+  display: inline-block;
+  margin-right: 0.5em;
+  vertical-align: text-bottom;
+}
+
+.start span{
 	color: #808080;
 	font-size: 1.2em;
 }
