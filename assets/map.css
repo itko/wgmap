@@ -25,11 +25,9 @@ body {
   display: flex;
   flex-wrap: wrap;
   border-width: 1px;
-  border-color: rgb(219, 219, 219);
+  border-color: rgb(246, 255, 254);
   border-style: solid;
-}
-
-.mapboxgl-popup-tip {
+  border-radius: 10px;
 }
 
 .mapboxgl-popup-content p {
@@ -41,12 +39,17 @@ body {
 }
 
 .popup-images {
-  max-width: 200px;
+  border-radius: 5px;
+  width: 150px;
+  height: 150px;
+  background-color: rgb(204, 203, 196);
 }
 
 .thumbnail {
-  max-width: 100%;
-  max-height: 200px;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  border-radius: 5px;
 }
 
 .column {
