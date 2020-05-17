@@ -23,12 +23,6 @@
 	</script>
 	<!-- End Google Analytics -->
 
-	<script src='https://api.tiles.mapbox.com/mapbox-gl-js/v1.5.0/mapbox-gl.js'></script>
-	<script>mapboxgl.accessToken = 'pk.eyJ1IjoiaXRrbyIsImEiOiJjazQ1Z2wzMmkwOGsyM29qdGs2b3lmaG92In0.ymoXX9Mx7eTOSnByhQ8gZg'</script>
-	<script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
-	<script src="assets/wNumb.js"></script>
-	<script src="assets/nouislider.js"></script>
-
 	<link rel="icon" type="image/x-icon" href="assets/houses.png">
 	<link href='https://api.tiles.mapbox.com/mapbox-gl-js/v1.6.0/mapbox-gl.css' rel='stylesheet' />
 	<link href='https://fonts.googleapis.com/css?family=Fredoka+One|Quicksand|Source+Sans+Pro:400,700' rel='stylesheet'>
@@ -58,6 +52,12 @@
 		</div>
 	</div>
 
+	<script src='https://api.tiles.mapbox.com/mapbox-gl-js/v1.5.0/mapbox-gl.js'></script>
+	<script>mapboxgl.accessToken = 'pk.eyJ1IjoiaXRrbyIsImEiOiJjazQ1Z2wzMmkwOGsyM29qdGs2b3lmaG92In0.ymoXX9Mx7eTOSnByhQ8gZg'</script>
+	<script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+	<script src="assets/wNumb.js"></script>
+	<script src="assets/nouislider.js"></script>
+	
 </body>
 
 <script>
@@ -244,6 +244,11 @@
 			// Change it back to a pointer when it leaves.
 			map.on('mouseleave', 'listing', function () {
 				map.getCanvas().style.cursor = '';
+			});
+
+			map.on('styledata', function() {
+				$('.loading-container').hide();
+				$('.mapboxgl-map').css({opacity: 1})
 			});
 
 			slider.noUiSlider.on('update', function (values, handle) {

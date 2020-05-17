@@ -1,14 +1,14 @@
 body {
   margin: 0;
   padding: 0;
-  background-color: rgb(255, 242, 226);
+  background-color: rgb(199, 189, 177);
 }
-
 .mapboxgl-map {
   position: absolute;
   top: 0;
   bottom: 0;
   width: 100%;
+  opacity: 0;
 }
 
 .mapboxgl-popup {
