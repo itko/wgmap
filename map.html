@@ -24,7 +24,7 @@
 	<!-- End Google Analytics -->
 
 	<link rel="icon" type="image/x-icon" href="assets/houses.png">
-	<link href='https://api.tiles.mapbox.com/mapbox-gl-js/v1.6.0/mapbox-gl.css' rel='stylesheet' />
+	<link href='https://api.tiles.mapbox.com/mapbox-gl-js/v1.10.1/mapbox-gl.css' rel='stylesheet' />
 	<link href='https://fonts.googleapis.com/css?family=Fredoka+One|Quicksand|Source+Sans+Pro:400,700' rel='stylesheet'>
 	<link rel="stylesheet" type="text/css" href="assets/loading.css">
 	<link rel="stylesheet" type="text/css" href="assets/map.css">
@@ -198,6 +198,13 @@
 		var ne = new mapboxgl.LngLat(cities['xmax'][city],cities['ymax'][city]);
 		var bounds = new mapboxgl.LngLatBounds(sw, ne);
 
+		p_color =  [
+					'case',
+					['==', ['feature-state', 'click'], null],
+					'rgb(191, 176, 219)',
+					'rgb(148, 112, 219)'
+				]
+
 		var map = new mapboxgl.Map({
 			container: "map",
 			style: 'mapbox://styles/itko/cka4hkp9z052d1io371imc8a9',
@@ -207,12 +214,12 @@
 		map.setMaxBounds(map.getBounds())
 		map.addControl(new mapboxgl.AttributionControl(), 'top-right');
 
-		
 		map.on("load", function() {
 
 			map.addSource("listings", {
 				type: "geojson",
 				data: 'https://res.cloudinary.com/itko/raw/upload/v1/WGmap/'+file_name+'.geojson',
+				generateId: true,
 				buffer: 0,
 				cluster: false,
 			});
@@ -222,11 +229,22 @@
 				source: "listings",
 				paint: {
 					"circle-opacity": 0.95,
-					"circle-color": "#9370DB",
-					"circle-radius": 8,
+					"circle-color": 'rgb(148, 112, 219)',
+					"circle-radius": [
+					'case',
+						['==', ['feature-state', 'click'], null],
+						8,
+						12
+					],
 					"circle-stroke-width": 1,
 					"circle-stroke-color": "#fff"
 				}
+			});
+			map.on('click', function () {
+				map.removeFeatureState(
+					{ source: 'listings' }
+				);
+				map.setPaintProperty('listing', 'circle-color', 'rgb(148, 112, 219)');
 			});
 			map.on('click', 'listing', function (e) {
 				gtag('event', 'click', {
@@ -245,7 +263,16 @@
 				while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
 					coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
 				}
-				new mapboxgl.Popup().setLngLat(coordinates).setHTML(popup).setMaxWidth('55%').addTo(map);
+				map.removeFeatureState(
+					{ source: 'listings' }
+				);
+				map.setFeatureState(
+					{ source: 'listings', id: e.features[0].id },
+					{ click: true }
+				);
+				map.setPaintProperty('listing', 'circle-color', p_color, {validate: false});
+
+				popup = new mapboxgl.Popup().setLngLat(coordinates).setHTML(popup).setMaxWidth('55%').addTo(map);
 			});
 
 			// Change the cursor to a pointer when the mouse is over the places layer.
