@@ -52,7 +52,7 @@
 		</div>
 	</div>
 
-	<script src='https://api.tiles.mapbox.com/mapbox-gl-js/v1.5.0/mapbox-gl.js'></script>
+	<script src='https://api.tiles.mapbox.com/mapbox-gl-js/v1.10.1/mapbox-gl.js'></script>
 	<script>mapboxgl.accessToken = 'pk.eyJ1IjoiaXRrbyIsImEiOiJjazQ1Z2wzMmkwOGsyM29qdGs2b3lmaG92In0.ymoXX9Mx7eTOSnByhQ8gZg'</script>
 	<script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
 	<script src="assets/wNumb.js"></script>
@@ -120,6 +120,18 @@
 		}
 	});
 
+	var captureSettingsButton = function(val) {
+		gtag('event', 'click', {
+			'event_category': 'settings',
+			'event_action': 'click_settings_button',
+			'event_label': val,
+			'event_value' : 1,
+			'transport_type': 'beacon'
+		});
+	}
+</script>
+	
+<script>
 	var captureMarkerOutbound = function(url) {
 		gtag('event', 'click', {
 			'event_category': 'marker',
@@ -130,17 +142,7 @@
 		});
 	}
 
-	var captureSettingsButton = function(val) {
-		gtag('event', 'click', {
-			'event_category': 'settings',
-			'event_action': 'click_settings_button',
-			'event_label': val,
-			'event_value' : 1,
-			'transport_type': 'beacon'
-		});
-	}
-
-	var makeHtmlFromProperties = function(props){
+	var getPopup = function(props,is_marked){
 		var popup = $('<div id="popup" ></div>')
 		var description = $('<div id="description" class="column popup-description"></div>')
 		
@@ -162,6 +164,15 @@
 		var start = $( '<span id="start""></span>' ).text(props.start)
 		start_wrapper.append([calendar_icon, start])
 
+		// Label
+		if (is_marked) {
+			var label = $('<div id="popup-label" class="label-marked"></div>')
+		}
+		else {
+			var label = $('<div id="popup-label" class="label-unmarked"></div>')
+		}
+
+
 		var images = $('<div id="popup-images" class="column popup-images"></div>')
 		if (props.thumb_url != 'null') {
 			thumb_url = props.thumb_url
@@ -175,13 +186,26 @@
 		description.append(address)
 		description.append(start_wrapper)
 		description.append(price_wrapper)
-		description.append(image)
+		description.append(label)
 
 		images.append(image)
 
 		popup.append(description)
 		popup.append(images)
 		return popup.html()
+	}
+
+	var marked = {ids: [], data: {
+		"type": "FeatureCollection",
+		"features": []
+	}}
+	var getMarked = function(id) {
+		if (marked.ids.includes(id)) {
+			return true;
+		}
+		else {
+			return false;
+		}
 	}
 
 	var urlParams = new URLSearchParams(window.location.search);
@@ -198,12 +222,18 @@
 		var ne = new mapboxgl.LngLat(cities['xmax'][city],cities['ymax'][city]);
 		var bounds = new mapboxgl.LngLatBounds(sw, ne);
 
-		p_color =  [
+		repaint_unmarked =  [
 					'case',
 					['==', ['feature-state', 'click'], null],
 					'rgb(191, 176, 219)',
 					'rgb(148, 112, 219)'
 				]
+		repaint_marked =  [
+			'case',
+			['==', ['feature-state', 'click'], null],
+			'#E4B3B3',
+			'#DF8181'
+		]
 
 		var map = new mapboxgl.Map({
 			container: "map",
@@ -211,10 +241,14 @@
 			attributionControl: false,
 			bounds: bounds
 		});
+		var popup = new mapboxgl.Popup()
 		map.setMaxBounds(map.getBounds())
 		map.addControl(new mapboxgl.AttributionControl(), 'top-right');
 
 		map.on("load", function() {
+
+			var filter_marked = ['!',['in', ['id'], ['literal',marked.ids]]]
+			var filter_price = ['!',['in', ['id'], ['literal',marked.ids]]]
 
 			map.addSource("listings", {
 				type: "geojson",
@@ -222,6 +256,12 @@
 				generateId: true,
 				buffer: 0,
 				cluster: false,
+			});
+			map.addSource("marked", {
+				type: "geojson",
+				data: marked.data,
+				generateId: true,
+				buffer: 0
 			});
 			map.addLayer({
 				id: "listing",
@@ -240,51 +280,107 @@
 					"circle-stroke-color": "#fff"
 				}
 			});
+			map.addLayer({
+				id: "listing-marked",
+				type: "circle",
+				source: "listings",
+				filter: ["in", ['id'], ['literal',[-1]]],
+				paint: {
+					"circle-opacity": 0.95,
+					"circle-color": '#DF8181',
+					"circle-radius": [
+					'case',
+						['==', ['feature-state', 'click'], null],
+						8,
+						12
+					],
+					"circle-stroke-width": 1,
+					"circle-stroke-color": "#fff"
+				}
+			});
 			map.on('click', function () {
 				map.removeFeatureState(
 					{ source: 'listings' }
 				);
 				map.setPaintProperty('listing', 'circle-color', 'rgb(148, 112, 219)');
+				map.setPaintProperty('listing-marked', 'circle-color', '#DF8181');
 			});
-			map.on('click', 'listing', function (e) {
-				gtag('event', 'click', {
-					'event_category' : 'marker',
-					'event_action' : 'click',
-					'event_label' : e.features[0].properties.ref,
-					'event_value' : 1,
-					'transport_type': 'beacon'
+			layers = ['listing','listing-marked']
+			layers.forEach(function(layer,index) {
+				map.on('click', layer, function (e) {
+					var id = e.features[0].id
+					gtag('event', 'click', {
+						'event_category' : 'marker',
+						'event_action' : 'click',
+						'event_label' : e.features[0].properties.ref,
+						'event_value' : 1,
+						'transport_type': 'beacon'
+					});
+					var is_marked = getMarked(id)
+					var coordinates = e.features[0].geometry.coordinates.slice();
+					
+					// Ensure that if the map is zoomed out such that multiple
+					// copies of the feature are visible, the popup appears
+					// over the copy being pointed to.
+					while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
+						coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
+					}
+					map.removeFeatureState(
+						{ source: 'listings' }
+					);
+					map.setFeatureState(
+						{ source: 'listings', id: id },
+						{ click: true }
+					);
+					map.setPaintProperty('listing-marked', 'circle-color', repaint_marked, {validate: false});
+					map.setPaintProperty('listing', 'circle-color', repaint_unmarked, {validate: false});
+
+					popup.remove()
+					var dom = getPopup(e.features[0].properties, is_marked);
+					popup = new mapboxgl.Popup().setLngLat(coordinates).setHTML(dom).setMaxWidth('55%').addTo(map);
+					$('#popup-label').click(function(){
+						$('#popup-label').toggleClass('label-unmarked label-marked');
+						// Check if we're marked now
+						if ($('#popup-label').attr('class').split(/\s+/).includes('label-marked')) {
+							// Check if we already marked it
+							if (!marked.ids.includes(id)) {
+								marked.ids.push(id)
+								marked.data.features.push(id)
+								map.getSource('marked').setData(marked.data)
+							}
+						}
+						// If we're not marked...
+						else {
+							// If we marked it before
+							if (marked.ids.includes(id)) {
+								var index = marked.ids.indexOf(id)
+								marked.ids.splice(index, 1)
+								marked.data.features.splice(index, 1)
+								map.getSource('marked').setData(marked.data)
+							}
+						}
+						map.setFilter('listing-marked',['in', ['id'], ['literal',marked.ids]])
+						filter_marked = ['!',['in', ['id'], ['literal',marked.ids]]]
+						var filt = [
+							'all',
+							filter_price,
+							filter_marked
+						]
+						map.setFilter('listing',filt)
+					});
 				});
-				var popup = makeHtmlFromProperties(e.features[0].properties);
-				var coordinates = e.features[0].geometry.coordinates.slice();
-				
-				// Ensure that if the map is zoomed out such that multiple
-				// copies of the feature are visible, the popup appears
-				// over the copy being pointed to.
-				while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
-					coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
-				}
-				map.removeFeatureState(
-					{ source: 'listings' }
-				);
-				map.setFeatureState(
-					{ source: 'listings', id: e.features[0].id },
-					{ click: true }
-				);
-				map.setPaintProperty('listing', 'circle-color', p_color, {validate: false});
 
-				popup = new mapboxgl.Popup().setLngLat(coordinates).setHTML(popup).setMaxWidth('55%').addTo(map);
-			});
+				// Change the cursor to a pointer when the mouse is over the places layer.
+				map.on('mouseenter', layer, function () {
+					map.getCanvas().style.cursor = 'pointer';
+				});
 
-			// Change the cursor to a pointer when the mouse is over the places layer.
-			map.on('mouseenter', 'listing', function () {
-				map.getCanvas().style.cursor = 'pointer';
-			});
-
-			// Change it back to a pointer when it leaves.
-			map.on('mouseleave', 'listing', function () {
-				map.getCanvas().style.cursor = '';
-			});
-
+				// Change it back to a pointer when it leaves.
+				map.on('mouseleave', layer, function () {
+					map.getCanvas().style.cursor = '';
+				});
+			})
+			
 			map.on('styledata', function() {
 				$('.loading-container').hide();
 				$('.mapboxgl-map').css({opacity: 1})
@@ -293,7 +389,13 @@
 			slider.noUiSlider.on('update', function (values, handle) {
 				var Pmin = parseInt(values[0])
 				var Pmax = parseInt(values[1])
-				map.setFilter('listing', ['all',['>=', 'price', Pmin],['<=', 'price', Pmax]]);
+				filter_price = ['all',['>=', ['get','price'], Pmin],['<=', ['get','price'], Pmax]]
+				var filt = [
+							'all',
+							filter_price,
+							filter_marked
+						]
+				map.setFilter('listing',filt)
 			});
 		});
 	});

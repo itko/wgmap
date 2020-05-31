@@ -88,6 +88,24 @@ body {
   vertical-align: text-bottom;
 }
 
+.popup-description .label-unmarked {
+  margin-top: 1em;
+  width: 4em;
+  height: 1.5em;
+  background-color: rgb(148, 112, 219);
+  border: 1px solid black;
+  border-radius: 2em;
+}
+
+.popup-description .label-marked {
+  margin-top: 1em;
+  width: 4em;
+  height: 1.5em;
+  background-color: #DF8181;
+  border: 1px solid black;
+  border-radius: 2em;
+}
+
 .start span{
 	color: #808080;
 	font-size: 1.2em;
