@@ -267,6 +267,9 @@
 				id: "listing",
 				type: "circle",
 				source: "listings",
+				layout: {
+					'circle-sort-key': ['id']
+				},
 				paint: {
 					"circle-opacity": 0.95,
 					"circle-color": 'rgb(148, 112, 219)',
@@ -285,6 +288,9 @@
 				type: "circle",
 				source: "listings",
 				filter: ["in", ['id'], ['literal',[-1]]],
+				layout: {
+					'circle-sort-key': ['id']
+				},
 				paint: {
 					"circle-opacity": 0.95,
 					"circle-color": '#DF8181',
@@ -333,7 +339,19 @@
 						{ click: true }
 					);
 					map.setPaintProperty('listing-marked', 'circle-color', repaint_marked, {validate: false});
+					map.setLayoutProperty('listing-marked', 'circle-sort-key',
+					['case',
+						['==', ['id'], id],
+						1,
+						0
+					], {validate: false});
 					map.setPaintProperty('listing', 'circle-color', repaint_unmarked, {validate: false});
+					map.setLayoutProperty('listing', 'circle-sort-key',
+					['case',
+						['==', ['id'], id],
+						1,
+						0
+					], {validate: false});
 
 					popup.remove()
 					var dom = getPopup(e.features[0].properties, is_marked);
