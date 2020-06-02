@@ -243,7 +243,7 @@
 		});
 		var popup = new mapboxgl.Popup()
 		map.setMaxBounds(map.getBounds())
-		map.addControl(new mapboxgl.AttributionControl(), 'top-right');
+		map.addControl(new mapboxgl.AttributionControl(), 'bottom-left');
 
 		map.on("load", function() {
 
@@ -337,7 +337,7 @@
 
 					popup.remove()
 					var dom = getPopup(e.features[0].properties, is_marked);
-					popup = new mapboxgl.Popup().setLngLat(coordinates).setHTML(dom).setMaxWidth('55%').addTo(map);
+					popup = new mapboxgl.Popup(closeButton=false, anchor='center').setLngLat(coordinates).setHTML(dom).setMaxWidth('400px').addTo(map);
 					$('#popup-label').click(function(){
 						$('#popup-label').toggleClass('label-unmarked label-marked');
 						// Check if we're marked now
