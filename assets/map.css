@@ -11,6 +11,10 @@ body {
   opacity: 0;
 }
 
+.mapboxgl-ctrl-bottom-left {
+  z-index: 0;
+}
+
 .mapbox-improve-map {
   display: none;
 }
