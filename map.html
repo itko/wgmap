@@ -176,6 +176,11 @@
 			var label = $('<div id="popup-label" class="label-unmarked"></div>')
 		}
 
+		description.append(address)
+		description.append(start_wrapper)
+		description.append(price_wrapper)
+		description.append(label)
+
 
 		var images = $('<div id="popup-images" class="column popup-images"></div>')
 		if (props.thumb_url != 'null') {
@@ -184,15 +189,12 @@
 		else {
 			thumb_url = './assets/house_icon.png'
 		}
+		var thumb = $(
+			'<a id="thumb-link" target="_blank" rel="noopener noreferrer"></a>')
+		thumb = thumb.attr('href', props.url)
+		thumb.append($('<img class="thumbnail" />').attr('src',thumb_url))
 
-		var image = $('<img class="thumbnail" />').attr('src',thumb_url)
-
-		description.append(address)
-		description.append(start_wrapper)
-		description.append(price_wrapper)
-		description.append(label)
-
-		images.append(image)
+		images.append(thumb)
 
 		popup.append(description)
 		popup.append(images)
