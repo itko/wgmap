@@ -1,13 +1,18 @@
 <html>
 <head>
 	<title>WGmap</title>
-	<meta name="description" content="WGmap is Switzerland's largest database for room and apartment rentals."/>
+	<meta name="description" content="Switzerland's largest database for room and apartment rentals."/>
 	<meta charset='utf-8' />
-	<meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
-	<meta property="og:url" content="http://www.wgmap.co/map" />
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta property="og:url" content="http://www.wgmap.co" />
 	<meta property="og:title" content="WGmap" />
-	<meta property="og:description" content="The largest source for room and apartment rentals." />
+	<meta property="og:description" content="Mapping apartment & room rentals throughout Switzerland." />
 	<meta property="og:image" content="https://res.cloudinary.com/itko/image/upload/v1/WGmap/thumbnail_og.png" />
+
+	<link rel="icon" type="image/x-icon" href="assets/houses.png">
+	<link href='https://fonts.googleapis.com/css?family=Fredoka+One|Quicksand' rel='stylesheet'>
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans&family=Comfortaa&family=Roboto&display=swap" rel="stylesheet">
+	<link rel="stylesheet" type="text/css" href="assets/landing.css">
 
 	<!-- Global site tag (gtag.js) - Google Analytics -->
 	<script async src="https://www.googletagmanager.com/gtag/js?id=UA-97552826-2"></script>
@@ -17,416 +22,28 @@
 		gtag('js', new Date());
 		gtag('config', 'UA-97552826-2');
 	</script>
-	<!-- End Google Analytics -->
-
-	<link rel="icon" type="image/x-icon" href="assets/houses.png">
-	<link href='https://api.tiles.mapbox.com/mapbox-gl-js/v1.10.1/mapbox-gl.css' rel='stylesheet' />
-	<link href='https://fonts.googleapis.com/css?family=Fredoka+One|Quicksand|Source+Sans+Pro:400,700' rel='stylesheet'>
-	<link rel="stylesheet" type="text/css" href="assets/loading.css">
-	<link rel="stylesheet" type="text/css" href="assets/map.css">
-	<link rel="stylesheet" type="text/css" href="assets/nouislider.css">
-	<link rel="stylesheet" type="text/css" href="assets/settings.css">
 </head>
 
-<body class='body'>
-
-	<div class='loading-container'>
-		<p>Loading</p>
-		<div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
-	</div>
-	<div id="map" class="mapboxgl-map">
-	</div>
-
-	<div 'home-button'>
-		<a href="/"><p class='logo'>WGmap</p></a>
-	</div>
-
-	<div class='settings'>
-		<div class='circle item hide' id='settings_btn'></div>
-		<div class='menu item' id='settings_menu'>
-			<div id='slider'></div>
-		</div>
-	</div>
-
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-	<script src='https://api.tiles.mapbox.com/mapbox-gl-js/v1.10.1/mapbox-gl.js'></script>
-	<script> mapboxgl.accessToken = 'pk.eyJ1IjoiaXRrbyIsImEiOiJjazQ1Z2wzMmkwOGsyM29qdGs2b3lmaG92In0.ymoXX9Mx7eTOSnByhQ8gZg'</script>
-	<script src="assets/wNumb.js"></script>
-	<script src="assets/nouislider.js"></script>
-
+<body>
+  <div id='content'>
+      <p id = home-title>WGmap</p>
+      <body>
+        <p class="message">
+          <br>
+          Unfortunately our service has come to an end.
+          <br><br>
+          In the past year, we have accomplished a lot, including becoming the largest database of apartment & room rentals in Switzerland. We are so proud to have served you and we hope to come back bigger and better in the future.
+          <br><br>
+          Thank you for your support. We wish you the best of luck in your home search. <span style= "font-style: normal;">&#x1F91E;</span>
+          <br><br>
+          Sincerely,
+          <br>
+          <span style='text-align: right !important;'>- The WGmap Team&nbsp;&nbsp;</span><span style= "font-style: normal;">&#x1F3E0;</span>
+        </p>
+    </body>
+    <div id ='feedback' class='feedback'>
+      <a href='feedback.html'>Leave A Comment</a>
+    </div>
+  </div>
 </body>
-
-<script>
-	var slider = document.getElementById('slider');
-	noUiSlider.create(slider, {
-		start: [ 400, 1500 ], // Handle start position
-		padding: 0,
-		margin: 100,
-		step: 100,
-		connect: true, // Display a colored bar between the handles
-		orientation: 'horizontal',
-		behaviour: 'none',
-		range: {
-			'min': 100,
-			'max': 1500
-    	},
-		tooltips: [
-			wNumb({
-				decimals: 0,
-				suffix:' CHF',
-				edit: function (value) {
-					return value == '100 CHF' ? 'Min' : value;
-					}
-				}),
-			wNumb({
-				decimals: 0,
-				suffix:' CHF',
-				edit: function (value) {
-					return value == '1500 CHF' ? 'Max' : value;
-					}
-				}),
-			]
-	});
-
-	$.fn.animateRotate = function(angle, duration, easing, complete) {
-		return this.each(function() {
-			var $elem = $(this);
-
-			$({deg: 0}).animate({deg: angle}, {
-				duration: duration,
-				easing: easing,
-				step: function(now) {
-					$elem.css({
-					transform: 'rotate(' + now + 'deg)'
-					});
-				},
-				complete: complete || $.noop
-			});
-  		});
-	};
-	$('#settings_btn').click(function(){
-		$('#settings_menu').animate({width: 'toggle'},150);
-		$('#settings_btn').toggleClass('show hide');
-		var c = $('#settings_btn').attr('class')
-		if (c.includes('hide')) {
-			captureSettingsButton('hide')
-		}
-		else if (c.includes('show')) {
-			captureSettingsButton('show')
-		}
-	});
-
-	var captureSettingsButton = function(val) {
-		gtag('event', 'click', {
-			'event_category': 'settings',
-			'event_action': 'click_settings_button',
-			'event_label': val,
-			'event_value' : 1,
-			'transport_type': 'beacon'
-		});
-	}
-</script>
-	
-<script>
-	var captureMarkerOutbound = function(url) {
-		gtag('event', 'click', {
-			'event_category': 'marker',
-			'event_action': 'click_outbound_listing',
-			'event_label': url,
-			'event_value' : 1,
-			'transport_type': 'beacon'
-		});
-	}
-
-	var captureLabelChange = function(new_label) {
-		gtag('event', 'click', {
-			'event_category': 'popup',
-			'event_action': 'change_label_to',
-			'event_label': new_label,
-			'event_value' : 1,
-			'transport_type': 'beacon'
-		});
-	}
-
-	var getPopup = function(props,is_marked){
-		var popup = $('<div id="popup" ></div>')
-		var description = $('<div id="description" class="column popup-description"></div>')
-		
-		// Address
-		var address = $(
-			'<a id="address" target="_blank" rel="noopener noreferrer"></a>').text(props.address.split(",")[0])
-		address = address.attr('href', props.url)
-		address.attr('onclick','captureMarkerOutbound("'+props.url+'")')
-		
-		// Price
-		var price_wrapper = $('<div class="price"></div>')
-		var price_icon = $( '<img class="icon"/>').attr('src','./assets/pricetag.png')
-		var price = $( '<span id="price""></span>' ).text('CHF ' + props.price)
-		price_wrapper.append([price_icon, price])
-		
-		// Start date
-		var start_wrapper = $('<div class="start"></div>')
-		var calendar_icon = $( '<img class="icon"/>').attr('src','./assets/calendar.svg')
-		var start = $( '<span id="start""></span>' ).text(props.start)
-		start_wrapper.append([calendar_icon, start])
-
-		// Label
-		if (is_marked) {
-			var label = $('<div id="popup-label" class="label-marked"></div>')
-		}
-		else {
-			var label = $('<div id="popup-label" class="label-unmarked"></div>')
-		}
-
-		description.append(address)
-		description.append(start_wrapper)
-		description.append(price_wrapper)
-		description.append(label)
-
-
-		var images = $('<div id="popup-images" class="column popup-images"></div>')
-		if (props.thumb_url != 'null') {
-			thumb_url = props.thumb_url
-		}
-		else {
-			thumb_url = './assets/house_icon.png'
-		}
-		var thumb = $(
-			'<a id="thumb-link" target="_blank" rel="noopener noreferrer"></a>')
-		thumb = thumb.attr('href', props.url)
-		thumb.append($('<img class="thumbnail" />').attr('src',thumb_url))
-
-		images.append(thumb)
-
-		popup.append(description)
-		popup.append(images)
-		return popup.html()
-	}
-
-	var marked = {ids: [], data: {
-		"type": "FeatureCollection",
-		"features": []
-	}}
-	var getMarked = function(id) {
-		if (marked.ids.includes(id)) {
-			return true;
-		}
-		else {
-			return false;
-		}
-	}
-
-	var urlParams = new URLSearchParams(window.location.search);
-	file_name = urlParams.get('city')
-
-	$.getJSON('https://res.cloudinary.com/itko/raw/upload/v1/WGmap/metadata.json', function(cities) {
-		for (let key in cities['file_name']) {
-			if (cities['file_name'][key] == file_name) {
-				city = key
-				break
-			}
-		}
-		var sw = new mapboxgl.LngLat(cities['xmin'][city],cities['ymin'][city]);
-		var ne = new mapboxgl.LngLat(cities['xmax'][city],cities['ymax'][city]);
-		var bounds = new mapboxgl.LngLatBounds(sw, ne);
-
-		repaint_unmarked =  [
-					'case',
-					['==', ['feature-state', 'click'], null],
-					'rgb(191, 176, 219)',
-					'rgb(148, 112, 219)'
-				]
-		repaint_marked =  [
-			'case',
-			['==', ['feature-state', 'click'], null],
-			'#E4B3B3',
-			'#DF8181'
-		]
-
-		var map = new mapboxgl.Map({
-			container: "map",
-			style: 'mapbox://styles/itko/cka4hkp9z052d1io371imc8a9',
-			attributionControl: false,
-			bounds: bounds
-		});
-		var popup = new mapboxgl.Popup()
-		map.setMaxBounds(map.getBounds())
-		map.addControl(new mapboxgl.AttributionControl(), 'bottom-left');
-
-		map.on("load", function() {
-
-			var filter_marked = ['!',['in', ['id'], ['literal',marked.ids]]]
-			var filter_price = ['!',['in', ['id'], ['literal',marked.ids]]]
-
-			map.addSource("listings", {
-				type: "geojson",
-				data: 'https://res.cloudinary.com/itko/raw/upload/v1/WGmap/'+file_name+'.geojson',
-				generateId: true,
-				buffer: 0,
-				cluster: false,
-			});
-			map.addSource("marked", {
-				type: "geojson",
-				data: marked.data,
-				generateId: true,
-				buffer: 0
-			});
-			map.addLayer({
-				id: "listing",
-				type: "circle",
-				source: "listings",
-				layout: {
-					'circle-sort-key': ['id']
-				},
-				paint: {
-					"circle-opacity": 0.95,
-					"circle-color": 'rgb(148, 112, 219)',
-					"circle-radius": [
-					'case',
-						['==', ['feature-state', 'click'], null],
-						8,
-						12
-					],
-					"circle-stroke-width": 1,
-					"circle-stroke-color": "#fff"
-				}
-			});
-			map.addLayer({
-				id: "listing-marked",
-				type: "circle",
-				source: "listings",
-				filter: ["in", ['id'], ['literal',[-1]]],
-				layout: {
-					'circle-sort-key': ['id']
-				},
-				paint: {
-					"circle-opacity": 0.95,
-					"circle-color": '#DF8181',
-					"circle-radius": [
-					'case',
-						['==', ['feature-state', 'click'], null],
-						8,
-						12
-					],
-					"circle-stroke-width": 1,
-					"circle-stroke-color": "#fff"
-				}
-			});
-			map.on('click', function () {
-				map.removeFeatureState(
-					{ source: 'listings' }
-				);
-				map.setPaintProperty('listing', 'circle-color', 'rgb(148, 112, 219)');
-				map.setPaintProperty('listing-marked', 'circle-color', '#DF8181');
-			});
-			layers = ['listing','listing-marked']
-			layers.forEach(function(layer,index) {
-				map.on('click', layer, function (e) {
-					var id = e.features[0].id
-					gtag('event', 'click', {
-						'event_category' : 'marker',
-						'event_action' : 'click',
-						'event_label' : e.features[0].properties.ref,
-						'event_value' : 1,
-						'transport_type': 'beacon'
-					});
-					var is_marked = getMarked(id)
-					var coordinates = e.features[0].geometry.coordinates.slice();
-					
-					// Ensure that if the map is zoomed out such that multiple
-					// copies of the feature are visible, the popup appears
-					// over the copy being pointed to.
-					while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
-						coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
-					}
-					map.removeFeatureState(
-						{ source: 'listings' }
-					);
-					map.setFeatureState(
-						{ source: 'listings', id: id },
-						{ click: true }
-					);
-					map.setPaintProperty('listing-marked', 'circle-color', repaint_marked, {validate: false});
-					map.setLayoutProperty('listing-marked', 'circle-sort-key',
-					['case',
-						['==', ['id'], id],
-						1,
-						0
-					], {validate: false});
-					map.setPaintProperty('listing', 'circle-color', repaint_unmarked, {validate: false});
-					map.setLayoutProperty('listing', 'circle-sort-key',
-					['case',
-						['==', ['id'], id],
-						1,
-						0
-					], {validate: false});
-
-					popup.remove()
-					var dom = getPopup(e.features[0].properties, is_marked);
-					popup = new mapboxgl.Popup(closeButton=false, anchor='center').setLngLat(coordinates).setHTML(dom).setMaxWidth('400px').addTo(map);
-					$('#popup-label').click(function(){
-						$('#popup-label').toggleClass('label-unmarked label-marked');
-						// Check if we're marked now
-						if ($('#popup-label').attr('class').split(/\s+/).includes('label-marked')) {
-							captureLabelChange('marked')
-							// If we didn't already add it to the marked list
-							if (!marked.ids.includes(id)) {
-								marked.ids.push(id)
-								marked.data.features.push(id)
-								map.getSource('marked').setData(marked.data)
-							}
-						}
-						// If we're not marked...
-						else {
-							captureLabelChange('unmarked')
-							// If we already added it to the marked list
-							if (marked.ids.includes(id)) {
-								var index = marked.ids.indexOf(id)
-								marked.ids.splice(index, 1)
-								marked.data.features.splice(index, 1)
-								map.getSource('marked').setData(marked.data)
-							}
-						}
-						map.setFilter('listing-marked',['in', ['id'], ['literal',marked.ids]])
-						filter_marked = ['!',['in', ['id'], ['literal',marked.ids]]]
-						var filt = [
-							'all',
-							filter_price,
-							filter_marked
-						]
-						map.setFilter('listing',filt)
-					});
-				});
-
-				// Change the cursor to a pointer when the mouse is over the places layer.
-				map.on('mouseenter', layer, function () {
-					map.getCanvas().style.cursor = 'pointer';
-				});
-
-				// Change it back to a pointer when it leaves.
-				map.on('mouseleave', layer, function () {
-					map.getCanvas().style.cursor = '';
-				});
-			})
-			
-			map.on('styledata', function() {
-				$('.loading-container').hide();
-				$('.mapboxgl-map').css({opacity: 1})
-			});
-
-			slider.noUiSlider.on('update', function (values, handle) {
-				var Pmin = parseInt(values[0])
-				var Pmax = parseInt(values[1])
-				filter_price = ['all',['>=', ['get','price'], Pmin],['<=', ['get','price'], Pmax]]
-				var filt = [
-							'all',
-							filter_price,
-							filter_marked
-						]
-				map.setFilter('listing',filt)
-			});
-		});
-	});
-
-</script>
 </html>
